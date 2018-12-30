@@ -1,18 +1,23 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-
+import os
 import csv
 import requests
-#import xlsxwriter
+import shutil
 import openpyxl
-import pandas as pd
+from number import getPhone
 from bs4 import BeautifulSoup
+from selenium import webdriver
 
+class Bot:
+	def __init_(self):
+		self.driver = webdriver.Firefox()
 
 class Process(object):
 	
 	def __inti__(self):
 		self.file_name = ''
+		self.file = ''
 	
 	def transliterate(self, name):
 	
@@ -70,10 +75,7 @@ class Process(object):
 		"""
 		Write xlsx
 		"""
-
-		file = self.file_name + '.xlsx'
-
-		workbook = openpyxl.load_workbook(file)
+		workbook = openpyxl.load_workbook(self.file)
 		sheet = workbook.active
 		
 		i+=1
@@ -87,27 +89,32 @@ class Process(object):
 		c3.value = data['address']
 		
 		c4 = sheet.cell(row=i, column=4)
-		c4.value = data['url']
+		c4.value = data['phone']
 
-		workbook.save(file)
-		#worksheet = workbook.add_worksheet('worksheet')
-		#worksheet.set_column('A:A', 50)
-		#link_format = workbook.add_format({'color': 'blue', 
-		#                                   'underline': True, 
-		#                                   'text_wrap': True})
-		#worksheet.write(0, i, data['title'])
-		#worksheet.write(1, i, data['price'])
-		#worksheet.write(2, i, data['address'])
-		#worksheet.write(3, i, data['url'])
-		#workbook.close()
-		#print(i) 
+		c5 = sheet.cell(row=i, column=5)
+		c5.value = data['url']
 
+		workbook.save(self.file)
+		
+		#directory = "~/Desktop/avito_parser/"
+		#directory = os.path.expanduser(directory)
+			
+		#if not os.path.exists(directory):
+		#	os.makedirs(directory)
+		
+		#direct = directory + file
+		#shutil.copy2(file, direct) 
+		#os.remove(file)
+	
 	def get_page_data(self, html):
 		soup = BeautifulSoup(html, 'lxml')
-
 		ads = soup.find('div',
 			class_='catalog-list').find_all('div',
 			class_='item_table')
+		
+		self.file = self.file_name + '.xlsx'
+		book = openpyxl.Workbook(self.file)
+		book.save(self.file)
 		
 		i = 0 
 		#print(len(ads))
@@ -120,6 +127,7 @@ class Process(object):
 
 			try:
 				url = 'https://www.avito.ru' + ad.find('div', class_='description').find('h3').find('a').get('href')
+				m_url = 'https://m.avito.ru/' + ad.find('div', class_='description').find('h3').find('a').get('href')
 			except:
 				url = ''
 
@@ -127,6 +135,12 @@ class Process(object):
 				price = ad.find('div', class_='about').text.strip()
 			except:
 				price = ''
+
+			try:
+				phone = getPhone(m_url)
+			
+			except:
+				phone = ''
 
 			try:
 				address = ad.find('p', class_='address').text.strip()
@@ -137,6 +151,7 @@ class Process(object):
 				'title': title,
 				'price': price,
 				'address': address,
+				'phone': phone,
 				'url': url
 			}
 			#self.file_writer_csv(data)
