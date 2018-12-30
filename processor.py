@@ -96,16 +96,7 @@ class Process(object):
 
 		workbook.save(self.file)
 		
-		#directory = "~/Desktop/avito_parser/"
-		#directory = os.path.expanduser(directory)
-			
-		#if not os.path.exists(directory):
-		#	os.makedirs(directory)
-		
-		#direct = directory + file
-		#shutil.copy2(file, direct) 
-		#os.remove(file)
-	
+
 	def get_page_data(self, html):
 		soup = BeautifulSoup(html, 'lxml')
 		ads = soup.find('div',
@@ -117,7 +108,7 @@ class Process(object):
 		book.save(self.file)
 		
 		i = 0 
-		#print(len(ads))
+		
 		for ad in ads:
 			
 			try:
@@ -157,7 +148,18 @@ class Process(object):
 			#self.file_writer_csv(data)
 			self.file_save_xlsx(data, i)
 			i+=1
-
+		
+		directory = "~/Desktop/avito_parser/"
+		directory = os.path.expanduser(directory)
+			
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		
+		direct = directory + self.file
+		
+		shutil.copy2(self.file, direct) 
+		os.remove(self.file)
+	
 	def result_hub(self, city, category):
 		self.file_name = city + '_' + category
 		
