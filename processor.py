@@ -5,22 +5,25 @@ import csv
 import requests
 import shutil
 import openpyxl
+import asyncio
 from number import getPhone
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from PyQt5.QtWidgets import (QMainWindow)
 
-class Process(object):
+
+class Processor(object):
 	
 	def __init__(self):
 		self.file_name = ''
 		self.file = ''
 		self.array_len = 0
-	 	self.completed = 0
+		self.completed = 0
 	
-	def progressbar(self, completed):
-		while completed < self.array_len:
-			return completed
+	async def progressbar(self):
+		while self.completed < self.array_len:
+			await asyncio.sleep(.04)
+			return self.completed
 
 	def transliterate(self, name):
 	
@@ -100,7 +103,8 @@ class Process(object):
 		workbook.save(self.file)
 		
 
-	def get_page_data(self, html):
+	async def get_page_data(self, html):
+		print('get_page_data')
 		soup = BeautifulSoup(html, 'lxml')
 		ads = soup.find('div',
 			class_='catalog-list').find_all('div',
@@ -109,9 +113,9 @@ class Process(object):
 		self.file = self.file_name + '.xlsx'
 		book = openpyxl.Workbook(self.file)
 		book.save(self.file)
-		
+		self.array_len = len(ads)
 		i = 0 
-		
+		self.array_len = len(ads)
 		for ad in ads:
 			
 			try:
@@ -150,10 +154,11 @@ class Process(object):
 			}
 			#self.file_writer_csv(data)
 			self.file_save_xlsx(data, i)
-			self.progressbar(i)
+			self.complited = i
+			print('это объект: ',self.complited)
 			i+=1
-
-		self.array_len = len(ads)
+			await asyncio.sleep(1)
+		
 		directory = "~/Desktop/avito_parser/"
 		directory = os.path.expanduser(directory)
 			
@@ -165,16 +170,29 @@ class Process(object):
 		shutil.copy2(self.file, direct) 
 		os.remove(self.file)
 	
-	def result_hub(self, city, category):
+	async def result_hub(self, city, category):
 		self.file_name = city + '_' + category
 		
 		base_url = 'https://www.avito.ru/'
 		part = '?p='
 		
 		#total_pages = get_total_pages(get_html())
+		loop = asyncio.get_event_loop()
 		
-		for i in range(1, 4):
+		for i in range(1, 2):
+			print('result_hub for')
 			url_gen = base_url + city + '/' + category + '/' + part + str(i)
 			html = self.get_html(url_gen)
-			self.get_page_data(html)
+			tasks = [  
+				asyncio.ensure_future(self.get_page_data(html)),
+			]
+			loop.run_until_complete(asyncio.wait(tasks))
+			await asyncio.sleep(1)
+		
+		loop.close()
+
+			
+
+	
+
 

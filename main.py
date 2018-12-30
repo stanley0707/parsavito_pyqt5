@@ -2,14 +2,23 @@
 # -*- coding: utf-8 -*-
 import sys
 import slug
-from processor import Process
+import time
+import asyncio
+from urllib.request import urlopen
+from processor import Processor
 from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget,
 	QPushButton, QAction, QLineEdit, QMessageBox, QProgressBar)
 
-
-
+"""def benchmark(func, *args, **kwargs):
+		started = time.time()
+		result = func(*args, **kwargs)
+		worked = time.time() - started
+		print('Функция"{}" выполнилась за {:f} микросекунд'.format(
+			func.__name__,worked * 1e6
+		))
+		return result"""
 
 class App(QMainWindow):
 	def __init__(self):
@@ -20,7 +29,9 @@ class App(QMainWindow):
 		self.width = 540
 		self.height = 340
 		self.initUi()
-		self.proc = Process()
+		self.proc = Processor()
+		self.worked_status = False
+		self.loop = asyncio.new_event_loop()
 		#self.initSearchTag()
 	
 	def initUi(self):
@@ -55,24 +66,43 @@ class App(QMainWindow):
 
 		self.show()
 
+
+	async def benchmark(self):
+		for i in range(10):
+			print('да')
+			await asyncio.sleep(1)
+		
+
 	@pyqtSlot()
 	def on_click(self):
-		
 		CityValue = self.citytext.text()
 		CategoryValue = self.categorytext.text()
 		
 		cuty = slug.slug(self.proc.transliterate(CityValue))
 		category = slug.slug(self.proc.transliterate(CategoryValue))
 		
-		self.proc.result_hub(cuty, category)
-		print(self.proc.progressbar())
+		loop = asyncio.get_event_loop()
+
+		tasks = [  
+			asyncio.ensure_future(self.proc.result_hub(cuty, category)),
+			asyncio.ensure_future(self.benchmark()),
+		]
+
+		print(self.proc.array_len)
+		
+		loop.run_until_complete(asyncio.wait(tasks))
+		loop.close()
 		#self.progress.setValue(self.proc.progressbar())
 		
+		self.worked_status = True
 		QMessageBox.question(self, 'Сканирование', CityValue, QMessageBox.Ok, QMessageBox.Ok)
 		self.citytext.setText("")
 		self.categorytext.setText("")
+
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
 	ex = App()
 	sys.exit(app.exec_())
+
+
