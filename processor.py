@@ -155,7 +155,6 @@ class Processor(object):
 			#self.file_writer_csv(data)
 			self.file_save_xlsx(data, i)
 			self.complited = i
-			print('это объект: ',self.complited)
 			i+=1
 			await asyncio.sleep(1)
 		
@@ -180,7 +179,6 @@ class Processor(object):
 		loop = asyncio.get_event_loop()
 		
 		for i in range(1, 2):
-			print('result_hub for')
 			url_gen = base_url + city + '/' + category + '/' + part + str(i)
 			html = self.get_html(url_gen)
 			tasks = [  

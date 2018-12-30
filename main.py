@@ -67,7 +67,7 @@ class App(QMainWindow):
 		self.show()
 
 
-	async def benchmark(self):
+	async def progress_checked(self):
 		for i in range(10):
 			print('да')
 			await asyncio.sleep(1)
@@ -85,7 +85,7 @@ class App(QMainWindow):
 
 		tasks = [  
 			asyncio.ensure_future(self.proc.result_hub(cuty, category)),
-			asyncio.ensure_future(self.benchmark()),
+			asyncio.ensure_future(self.progress_checked()),
 		]
 
 		print(self.proc.array_len)
