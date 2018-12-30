@@ -8,17 +8,20 @@ import openpyxl
 from number import getPhone
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
-class Bot:
-	def __init_(self):
-		self.driver = webdriver.Firefox()
+from PyQt5.QtWidgets import (QMainWindow)
 
 class Process(object):
 	
-	def __inti__(self):
+	def __init__(self):
 		self.file_name = ''
 		self.file = ''
+		self.array_len = 0
+	 	self.completed = 0
 	
+	def progressbar(self, completed):
+		while completed < self.array_len:
+			return completed
+
 	def transliterate(self, name):
 	
 		slovar = {'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e',
@@ -147,8 +150,10 @@ class Process(object):
 			}
 			#self.file_writer_csv(data)
 			self.file_save_xlsx(data, i)
+			self.progressbar(i)
 			i+=1
-		
+
+		self.array_len = len(ads)
 		directory = "~/Desktop/avito_parser/"
 		directory = os.path.expanduser(directory)
 			

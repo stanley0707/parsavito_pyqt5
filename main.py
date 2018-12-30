@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 import sys
 import slug
-
 from processor import Process
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QIcon
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget,
-	QPushButton, QAction, QLineEdit, QMessageBox)
+	QPushButton, QAction, QLineEdit, QMessageBox, QProgressBar)
 
 
 
@@ -33,6 +32,7 @@ class App(QMainWindow):
 		info = QAction( 'info', self )
 		
 		fileMenu.addAction(info)
+		self.setWindowIcon(QtGui.QIcon('web.png'))
 		
 		self.citytext = QLineEdit(self)
 		self.citytext.setPlaceholderText(" введите город")
@@ -47,18 +47,26 @@ class App(QMainWindow):
 		self.button = QPushButton('сканировать', self)
 		self.button.move(120, 180)
 		self.button.resize(280, 30)
-
 		self.button.clicked.connect(self.on_click)
-		self.setWindowIcon(QIcon('web.png'))
+		#self.progress = QProgressBar(self)
+		#self.progress.move(120, 220)
+		#self.progress.resize(280, 30)
+
+
 		self.show()
 
 	@pyqtSlot()
 	def on_click(self):
+		
 		CityValue = self.citytext.text()
 		CategoryValue = self.categorytext.text()
+		
 		cuty = slug.slug(self.proc.transliterate(CityValue))
 		category = slug.slug(self.proc.transliterate(CategoryValue))
+		
 		self.proc.result_hub(cuty, category)
+		print(self.proc.progressbar())
+		#self.progress.setValue(self.proc.progressbar())
 		
 		QMessageBox.question(self, 'Сканирование', CityValue, QMessageBox.Ok, QMessageBox.Ok)
 		self.citytext.setText("")
