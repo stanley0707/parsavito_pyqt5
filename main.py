@@ -53,16 +53,16 @@ class App(QMainWindow):
 		self.categorytext.setPlaceholderText(" введите категорию")
 		self.categorytext.move(120, 80)
 		self.categorytext.resize(280, 30)
-
+		
+		self.progress = QProgressBar(self)
+		self.progress.move(120, 220)
+		self.progress.resize(280, 30)
+		
 		self.button = QPushButton('сканировать', self)
 		self.button.move(120, 180)
 		self.button.resize(280, 30)
 		self.button.clicked.connect(self.on_click)
-		#self.progress = QProgressBar(self)
-		#self.progress.move(120, 220)
-		#self.progress.resize(280, 30)
-
-
+		
 		self.show()
 
 
@@ -71,6 +71,8 @@ class App(QMainWindow):
 		iterator = 2
 		s = 0 
 		while  0 < i <= iterator: # 1 / 1
+			self.progress.setMaximum(self.proc.array_len)
+			self.progress.setValue(s)
 			if i == 1 and s < self.proc.array_len:
 				iterator = self.proc.array_len # 50
 				i = self.proc.array_len
@@ -78,7 +80,7 @@ class App(QMainWindow):
 			iterator-=1
 			s +=1
 			print('итераторы', i, iterator)
-			await asyncio.sleep(0.5)
+			await asyncio.sleep(0.1)
 	
 	@pyqtSlot()
 	def on_click(self):
@@ -95,12 +97,8 @@ class App(QMainWindow):
 			asyncio.ensure_future(self.proc.result_hub(cuty, category, self.loop), loop=self.loop),
 			asyncio.ensure_future(self.progress_checked()),
 		]
-		#try:
 		self.loop.run_until_complete(asyncio.wait(tasks))
-		#finally:
-		#self.loop.stop()
-		#self.progress.setValue(self.proc.progressbar())
-
+		
 		QMessageBox.question(self, 'Сканирование', CityValue, QMessageBox.Ok, QMessageBox.Ok)
 		self.citytext.setText("")
 		self.categorytext.setText("")
