@@ -30,7 +30,6 @@ class App(QMainWindow):
 		self.height = 340
 		self.initUi()
 		self.proc = Processor()
-		self.worked_status = False
 		self.loop = asyncio.new_event_loop()
 		#self.initSearchTag()
 	
@@ -68,13 +67,24 @@ class App(QMainWindow):
 
 
 	async def progress_checked(self):
-		for i in range(10):
-			print('да')
+		i = 2
+		iterator = 2
+		s = 0 
+		while  0 < i <= iterator: # 1 / 1
+			if i == 1 and s < self.proc.array_len:
+				iterator = self.proc.array_len # 50
+				i = self.proc.array_len
+			i-=1
+			iterator-=1
+			s +=1
+			print('итераторы', i, iterator)
 			await asyncio.sleep(1)
+		self.loop.stop()
 		
 
 	@pyqtSlot()
 	def on_click(self):
+
 		CityValue = self.citytext.text()
 		CategoryValue = self.categorytext.text()
 		
@@ -87,14 +97,13 @@ class App(QMainWindow):
 			asyncio.ensure_future(self.proc.result_hub(cuty, category)),
 			asyncio.ensure_future(self.progress_checked()),
 		]
-
-		print(self.proc.array_len)
 		
 		loop.run_until_complete(asyncio.wait(tasks))
-		loop.close()
-		#self.progress.setValue(self.proc.progressbar())
+		loop.stop()
 		
-		self.worked_status = True
+		#self.progress.setValue(self.proc.progressbar())
+		#self.worked_status = True
+		
 		QMessageBox.question(self, 'Сканирование', CityValue, QMessageBox.Ok, QMessageBox.Ok)
 		self.citytext.setText("")
 		self.categorytext.setText("")
@@ -104,5 +113,3 @@ if __name__ == '__main__':
 	app = QApplication(sys.argv)
 	ex = App()
 	sys.exit(app.exec_())
-
-

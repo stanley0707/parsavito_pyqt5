@@ -19,11 +19,7 @@ class Processor(object):
 		self.file = ''
 		self.array_len = 0
 		self.completed = 0
-	
-	async def progressbar(self):
-		while self.completed < self.array_len:
-			await asyncio.sleep(.04)
-			return self.completed
+		self.loop_ = asyncio.new_event_loop()
 
 	def transliterate(self, name):
 	
@@ -104,18 +100,19 @@ class Processor(object):
 		
 
 	async def get_page_data(self, html):
-		print('get_page_data')
 		soup = BeautifulSoup(html, 'lxml')
+		
 		ads = soup.find('div',
 			class_='catalog-list').find_all('div',
 			class_='item_table')
 		
+		self.array_len = len(ads)
+		
 		self.file = self.file_name + '.xlsx'
 		book = openpyxl.Workbook(self.file)
 		book.save(self.file)
-		self.array_len = len(ads)
+
 		i = 0 
-		self.array_len = len(ads)
 		for ad in ads:
 			
 			try:
@@ -152,6 +149,7 @@ class Processor(object):
 				'phone': phone,
 				'url': url
 			}
+			print('request', i)
 			#self.file_writer_csv(data)
 			self.file_save_xlsx(data, i)
 			self.complited = i
@@ -168,26 +166,26 @@ class Processor(object):
 		
 		shutil.copy2(self.file, direct) 
 		os.remove(self.file)
+		self.loop_.stop()
 	
 	async def result_hub(self, city, category):
 		self.file_name = city + '_' + category
 		
 		base_url = 'https://www.avito.ru/'
 		part = '?p='
-		
-		#total_pages = get_total_pages(get_html())
-		loop = asyncio.get_event_loop()
+		tasks = []
 		
 		for i in range(1, 2):
 			url_gen = base_url + city + '/' + category + '/' + part + str(i)
 			html = self.get_html(url_gen)
-			tasks = [  
+			tasks += [  
 				asyncio.ensure_future(self.get_page_data(html)),
 			]
-			loop.run_until_complete(asyncio.wait(tasks))
-			await asyncio.sleep(1)
+		await asyncio.sleep(1)
+		self.loop_.run_until_complete(asyncio.wait(tasks))
+		self.loop_.stop()
+
 		
-		loop.close()
 
 			
 
