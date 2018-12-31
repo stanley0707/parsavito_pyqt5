@@ -6,7 +6,7 @@ import time
 import asyncio
 from urllib.request import urlopen
 from processor import Processor
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QSize
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget,
 	QPushButton, QAction, QLineEdit, QMessageBox, QProgressBar)
@@ -31,7 +31,7 @@ class App(QMainWindow):
 		self.initUi()
 		self.proc = Processor()
 		self.loop = asyncio.get_event_loop()
-		#self.initSearchTag()
+		self.setStyleSheet("background-image: url(icon.png)")
 	
 	def initUi(self):
 		self.setWindowTitle(self.title)
@@ -40,9 +40,6 @@ class App(QMainWindow):
 		mainMenu = self.menuBar()
 		fileMenu = mainMenu.addMenu('info')
 		info = QAction( 'info', self )
-		
-		fileMenu.addAction(info)
-		self.setWindowIcon(QtGui.QIcon('web.png'))
 		
 		self.citytext = QLineEdit(self)
 		self.citytext.setPlaceholderText(" введите город")
@@ -79,8 +76,7 @@ class App(QMainWindow):
 			i-=1
 			iterator-=1
 			s +=1
-			print('итераторы', i, iterator)
-			await asyncio.sleep(0.1)
+			await asyncio.sleep(0.001)
 	
 	@pyqtSlot()
 	def on_click(self):
@@ -99,7 +95,9 @@ class App(QMainWindow):
 		]
 		self.loop.run_until_complete(asyncio.wait(tasks))
 		
-		QMessageBox.question(self, 'Сканирование', CityValue, QMessageBox.Ok, QMessageBox.Ok)
+		message = str('Сканирование завершено успешно! \n резултат:   ~/Desktop/avito_parser/' + cuty + '_' + category + '.xslx')
+		
+		QMessageBox.information(self, 'успешно', message, QMessageBox.Ok, QMessageBox.Ok)
 		self.citytext.setText("")
 		self.categorytext.setText("")
 
@@ -126,4 +124,3 @@ if __name__ == '__main__':
 	app = QApplication(sys.argv)
 	ex = App()
 	sys.exit(app.exec_())
-

@@ -42,11 +42,10 @@ class Processor(object):
 			name = name.replace(key, slovar[key])
 		return name
 	
-	#@asyncio.coroutine
 	def get_html(self, url):
 		r = requests.get(url)
 		return r.text
-
+	"""
 	def get_total_pages(self, html):
 		soup = BeautifulSoup(html, 'lxml')
 		pages = soup.find('div', 
@@ -56,7 +55,7 @@ class Processor(object):
 
 		return int(total_pages)
 	
-	"""
+	
 	def file_writer_csv(self, data):
 		
 		file = self.file_name + '.csv'
@@ -70,11 +69,8 @@ class Processor(object):
 									data['url']})
 			f.close()
 	"""
-	#@asyncio.coroutine
+	
 	def file_save_xlsx(self, data, i):
-		"""
-		Write xlsx
-		"""
 		workbook = openpyxl.load_workbook(self.file)
 		sheet = workbook.active
 		
@@ -147,12 +143,11 @@ class Processor(object):
 				'phone': phone,
 				'url': url
 			}
-			print('request', i)
 			#self.file_writer_csv(data)
 			self.file_save_xlsx(data, i)
 			self.complited = i
 			i+=1
-			await asyncio.sleep(0.5)
+			await asyncio.sleep(0.001)
 		
 		directory = "~/Desktop/avito_parser/"
 		directory = os.path.expanduser(directory)
@@ -170,15 +165,10 @@ class Processor(object):
 		
 		base_url = 'https://www.avito.ru/'
 		part = '?p='
-		#tasks = []
 		
 		# total_pages = get_total_pages()
 		for i in range(1, 2):
 			url_gen = base_url + city + '/' + category + '/' + part + str(i)
 			html = self.get_html(url_gen)
 			loop.create_task(self.get_page_data(html))
-			#tasks += [  
-			#	asyncio.ensure_future(self.get_page_data(html)),
-			#]
-			#loop.run_forever()
-		await asyncio.sleep(0.5)
+		await asyncio.sleep(0.001)
