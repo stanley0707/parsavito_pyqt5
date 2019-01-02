@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/Cellar/python
 # -*- coding: utf-8 -*-
 import os
 import csv
@@ -8,9 +8,7 @@ import openpyxl
 import asyncio
 from number import getPhone
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from PyQt5.QtWidgets import (QMainWindow)
-
+from PyQt5.QtWidgets import QMainWindow
 
 class Processor(object):
 	
@@ -18,9 +16,7 @@ class Processor(object):
 		self.file_name = ''
 		self.file = ''
 		self.array_len = 0
-		self.completed = 0
-		#self.loop_ = asyncio.new_event_loop()
-
+	
 	def transliterate(self, name):
 	
 		slovar = {'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e',
@@ -45,30 +41,6 @@ class Processor(object):
 	def get_html(self, url):
 		r = requests.get(url)
 		return r.text
-	"""
-	def get_total_pages(self, html):
-		soup = BeautifulSoup(html, 'lxml')
-		pages = soup.find('div', 
-			class_='pagination-pages').find_all(
-				'a', class_='pagination-page')[-1].get('href')
-		total_pages = pages.spli('=')[1].split("&")[0]
-
-		return int(total_pages)
-	
-	
-	def file_writer_csv(self, data):
-		
-		file = self.file_name + '.csv'
-		
-		with open(file, 'a') as f:
-			writer = csv.writer(f)
-
-			writer.writerow({data['title'],
-									data['price'],
-									data['address'],
-									data['url']})
-			f.close()
-	"""
 	
 	def file_save_xlsx(self, data, i):
 		workbook = openpyxl.load_workbook(self.file)
@@ -143,11 +115,9 @@ class Processor(object):
 				'phone': phone,
 				'url': url
 			}
-			#self.file_writer_csv(data)
 			self.file_save_xlsx(data, i)
-			self.complited = i
 			i+=1
-			await asyncio.sleep(0.001)
+			await asyncio.sleep(0.002)
 		
 		directory = "~/Desktop/avito_parser/"
 		directory = os.path.expanduser(directory)
@@ -157,7 +127,7 @@ class Processor(object):
 		
 		direct = directory + self.file
 		
-		shutil.copy2(self.file, direct) 
+		shutil.copy(self.file, direct) 
 		os.remove(self.file)
 
 	async def result_hub(self, city, category, loop):
@@ -166,9 +136,8 @@ class Processor(object):
 		base_url = 'https://www.avito.ru/'
 		part = '?p='
 		
-		# total_pages = get_total_pages()
 		for i in range(1, 2):
 			url_gen = base_url + city + '/' + category + '/' + part + str(i)
 			html = self.get_html(url_gen)
 			loop.create_task(self.get_page_data(html))
-		await asyncio.sleep(0.001)
+		await asyncio.sleep(0.002)

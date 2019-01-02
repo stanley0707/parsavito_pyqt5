@@ -1,8 +1,9 @@
+#!/usr/local/Cellar/python
+# -*- coding: utf-8 -*-
 import requests
-from urllib.parse import urljoin
- 
 from lxml.html import fromstring
  
+
 def getPhone(url):
     headers = {
     'User-Agent' : 'Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.9.0.13) Gecko/2009073022 Firefox/3.0.13',
