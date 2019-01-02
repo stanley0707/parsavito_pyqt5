@@ -1,4 +1,4 @@
-#!/usr/local/Cellar/python
+#!/env/lib/python3
 # -*- coding: utf-8 -*-
 import requests
 from lxml.html import fromstring

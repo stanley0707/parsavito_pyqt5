@@ -1,4 +1,4 @@
-#!/usr/local/Cellar/python
+#!/env/lib/python3
 # -*- coding: utf-8 -*-
 import os
 import csv
@@ -74,7 +74,13 @@ class Processor(object):
 		
 		self.array_len = len(ads)
 		
-		self.file = self.file_name + '.xlsx'
+		directory = os.path.expanduser("~/Desktop/avito_parser/")
+		
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+	
+		self.file = directory + self.file_name + '.xlsx'
+		
 		book = openpyxl.Workbook(self.file)
 		book.save(self.file)
 
@@ -119,17 +125,6 @@ class Processor(object):
 			i+=1
 			await asyncio.sleep(0.002)
 		
-		directory = "~/Desktop/avito_parser/"
-		directory = os.path.expanduser(directory)
-			
-		if not os.path.exists(directory):
-			os.makedirs(directory)
-		
-		direct = directory + self.file
-		
-		shutil.copy(self.file, direct) 
-		os.remove(self.file)
-
 	async def result_hub(self, city, category, loop):
 		self.file_name = city + '_' + category
 		

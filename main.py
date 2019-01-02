@@ -1,4 +1,4 @@
-#!/usr/local/Cellar/python
+#!./env/lib/python3
 # -*- coding: utf-8 -*-
 import sys
 import slug
@@ -21,7 +21,7 @@ class App(QMainWindow):
 		self.proc = Processor()
 		self.loop = asyncio.get_event_loop()
 		#self.array = 0
-		self.setStyleSheet("background-image: url(parser-avito.ico)")
+		#self.setStyleSheet("background-image: url(parser-avito.ico)")
 		self.initUi()
 	
 	def initUi(self):
