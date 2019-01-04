@@ -15,6 +15,7 @@ class Processor(object):
 	def __init__(self):
 		self.file_name = ''
 		self.file = ''
+		self.text_to_user = ''
 		self.array_len = 0
 		self.status = True
 	
@@ -128,6 +129,7 @@ class Processor(object):
 				'phone': phone,
 				'url': url
 			}
+			self.text_to_user = title +' '+phone
 			self.file_save_xlsx(data, i)
 			i+=1
 			await asyncio.sleep(0.002)

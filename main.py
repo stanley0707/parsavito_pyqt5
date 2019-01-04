@@ -127,6 +127,8 @@ class App(QMainWindow):
 		while  0 < i <= iterator: # 1 / 1
 			self.progress.setMaximum(self.proc.array_len)
 			self.progress.setValue(s)
+			mes = 'сканировано объектов: ' + str(s) +'\n'+ self.proc.text_to_user
+			self.lbl1.setText(mes)
 			QApplication.processEvents()
 			if i == 1 and s < self.proc.array_len:
 				iterator = self.proc.array_len
@@ -144,12 +146,14 @@ class App(QMainWindow):
 		
 		cuty = slug.slug(self.proc.transliterate(CityValue))
 		category = slug.slug(self.proc.transliterate(CategoryValue))
-		tasks = [  
-				asyncio.ensure_future(self.proc.result_hub(cuty, category, self.loop), loop=self.loop),
-				asyncio.ensure_future(self.progress_checked()),
-		]
-		self.loop.run_until_complete(asyncio.wait(tasks))
-		
+		if cuty and category != '':
+			tasks = [  
+					asyncio.ensure_future(self.proc.result_hub(cuty, category, self.loop), loop=self.loop),
+					asyncio.ensure_future(self.progress_checked()),
+			]
+			self.loop.run_until_complete(asyncio.wait(tasks))
+		else:
+			return False
 		if self.proc.status:
 			message = str('Сканирование завершено успешно! \n резултат:   ~/Desktop/avito_parser/' + cuty + '_' + category + '.xslx')
 			
