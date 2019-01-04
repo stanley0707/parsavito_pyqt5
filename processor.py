@@ -16,6 +16,7 @@ class Processor(object):
 		self.file_name = ''
 		self.file = ''
 		self.array_len = 0
+		self.status = True
 	
 	def transliterate(self, name):
 	
@@ -67,10 +68,16 @@ class Processor(object):
 
 	async def get_page_data(self, html):
 		soup = BeautifulSoup(html, 'lxml')
+		try:
+			ads = soup.find('div',
+				class_='catalog-list').find_all('div',
+				class_='item_table')
+			
+			self.status = True
 		
-		ads = soup.find('div',
-			class_='catalog-list').find_all('div',
-			class_='item_table')
+		except AttributeError:
+			self.status = False
+			return False
 		
 		self.array_len = len(ads)
 		
@@ -131,7 +138,7 @@ class Processor(object):
 		base_url = 'https://www.avito.ru/'
 		part = '?p='
 		
-		for i in range(1, 2):
+		for i in range(1, 3):
 			url_gen = base_url + city + '/' + category + '/' + part + str(i)
 			html = self.get_html(url_gen)
 			loop.create_task(self.get_page_data(html))
